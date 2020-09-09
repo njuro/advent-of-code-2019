@@ -1,12 +1,19 @@
 import kotlin.math.floor
 
-fun calculateFuel(mass: Int, part2: Boolean): Int {
-    val fuel = (floor(mass / 3.0) - 2).toInt()
-    if (!part2) return fuel
+/** [https://adventofcode.com/2019/day/1] */
+class FuelCalculator : AdventOfCodeTask {
+    override fun run(part2: Boolean): Any {
+        return readInputLines("1.txt").map { it.toInt() }.map { calculateFuel(it, fuelNeedsFuel = part2) }.sum()
+    }
 
-    return if (fuel > 0) fuel + calculateFuel(fuel, part2) else 0
+    private fun calculateFuel(mass: Int, fuelNeedsFuel: Boolean): Int {
+        val fuel = (floor(mass / 3.0) - 2).toInt()
+        if (!fuelNeedsFuel) return fuel
+
+        return if (fuel > 0) fuel + calculateFuel(fuel, fuelNeedsFuel) else 0
+    }
 }
 
 fun main() {
-    println(readInputLines("1").map { it.toInt() }.map { calculateFuel(it, part2 = true) }.sum())
+    println(FuelCalculator().run(part2 = true))
 }
