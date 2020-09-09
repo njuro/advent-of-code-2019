@@ -28,6 +28,11 @@ class AdventOfCodeTasksTest {
         runTaskTest(ExtendedIntCode(), 14155342, 8684145)
     }
 
+    @Test
+    fun day6() {
+        runTaskTest(PlanetOrbits(), 308790, 472)
+    }
+
     private fun runTaskTest(task: AdventOfCodeTask, part1Result: Any, part2Result: Any) {
         assertEquals(part1Result, task.run())
         assertEquals(part2Result, task.run(part2 = true))
