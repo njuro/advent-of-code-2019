@@ -38,6 +38,18 @@ class AdventOfCodeTasksTest {
         runTaskTest(Amplifiers(), 118936, 57660948)
     }
 
+    @Test
+    fun day8() {
+        val message = """
+        ###  #  # #  # ###  #   #
+        #  # # #  #  # #  # #   #
+        #  # ##   #### #  #  # # 
+        ###  # #  #  # ###    #  
+        # #  # #  #  # # #    #  
+        #  # #  # #  # #  #   #  """.trimIndent()
+        runTaskTest(ImageFormat(), 2375, message)
+    }
+
     private fun runTaskTest(task: AdventOfCodeTask, part1Result: Any, part2Result: Any) {
         assertEquals(part1Result, task.run())
         assertEquals(part2Result, task.run(part2 = true))
