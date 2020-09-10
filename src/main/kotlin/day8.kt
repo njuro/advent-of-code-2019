@@ -10,15 +10,15 @@ class ImageFormat : AdventOfCodeTask {
                 .let { it.count { ch -> ch == '1' } * it.count { ch -> ch == '2' } }
         }
 
-        fun combineLayers(first: String, second: String): String {
-            return first.mapIndexed { index, c -> if (c == '2') second[index] else c }.joinToString("")
-        }
-
-        fun drawRow(row: String): String {
-            return row.map { c -> if (c == '1') '#' else ' ' }.joinToString("")
-        }
-
         return layers.reduce(::combineLayers).chunked(width).joinToString("\n", transform = ::drawRow)
+    }
+
+    private fun combineLayers(first: String, second: String): String {
+        return first.mapIndexed { index, c -> if (c == '2') second[index] else c }.joinToString("")
+    }
+
+    private fun drawRow(row: String): String {
+        return row.map { c -> if (c == '1') '#' else ' ' }.joinToString("")
     }
 }
 
