@@ -1,11 +1,15 @@
 /** [https://adventofcode.com/2019/day/5] */
 class ExtendedIntCode : AdventOfCodeTask {
     override fun run(part2: Boolean): Any {
-        val ops = readInputBlock("5.txt").split(",").map { it.toInt() }.toMutableList()
-        return compute(ops, systemId = if (part2) 5 else 1)
+        val ops = parseOps(filename = "5.txt")
+        return compute(ops, onInput = { if (part2) 5 else 1 })
     }
 
-    private fun compute(ops: MutableList<Int>, systemId: Int): Int {
+    fun parseOps(filename: String): MutableList<Int> {
+        return readInputBlock(filename).split(",").map { it.toInt() }.toMutableList()
+    }
+
+    fun compute(ops: MutableList<Int>, onInput: () -> Int, onOutput: ((Int) -> Unit)? = null): Int {
         var diagnosticCode = -1
         var i = 0
         while (true) {
@@ -30,11 +34,14 @@ class ExtendedIntCode : AdventOfCodeTask {
                     i += 4
                 }
                 3 -> {
-                    ops[ops[i + 1]] = systemId
+                    ops[ops[i + 1]] = onInput()
                     i += 2
                 }
                 4 -> {
                     diagnosticCode = getParameterValue(1)
+                    if (onOutput != null) {
+                        onOutput(diagnosticCode)
+                    }
                     i += 2
                 }
                 5 -> {
