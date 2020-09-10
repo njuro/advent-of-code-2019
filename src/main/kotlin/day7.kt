@@ -46,7 +46,7 @@ class Amplifiers : AdventOfCodeTask {
     }
 
     private fun computeTotalSignal(
-        ops: MutableList<Int>,
+        ops: MutableList<Long>,
         aPhase: Int,
         bPhase: Int,
         cPhase: Int,
@@ -61,15 +61,15 @@ class Amplifiers : AdventOfCodeTask {
         return computeAmplifierSignal(ops, ePhase, dSignal)
     }
 
-    private fun computeAmplifierSignal(ops: MutableList<Int>, phaseSetting: Int, inputSignal: Int): Int {
-        val inputs = mutableListOf(phaseSetting, inputSignal)
+    private fun computeAmplifierSignal(ops: MutableList<Long>, phaseSetting: Int, inputSignal: Int): Int {
+        val inputs = mutableListOf(phaseSetting.toLong(), inputSignal.toLong())
         return computer.compute(
             ops.toMutableList(),
-            onInput = { inputs.removeFirst() })
+            onInput = { inputs.removeFirst() }).toInt()
     }
 
     private fun computeTotalSignalAsync(
-        ops: MutableList<Int>,
+        ops: MutableList<Long>,
         aPhase: Int,
         bPhase: Int,
         cPhase: Int,
@@ -99,15 +99,15 @@ class Amplifiers : AdventOfCodeTask {
     }
 
     private fun computeAmplifierSignalAsync(
-        ops: MutableList<Int>,
+        ops: MutableList<Long>,
         inputChannel: Channel<Int>,
         outputChannel: Channel<Int>
     ): Job {
         return GlobalScope.launch {
             computer.compute(
                 ops.toMutableList(),
-                onInput = { runBlocking { inputChannel.receive() } },
-                onOutput = { runBlocking { outputChannel.send(it) } }
+                onInput = { runBlocking { inputChannel.receive().toLong() } },
+                onOutput = { runBlocking { outputChannel.send(it.toInt()) } }
             )
         }
     }
