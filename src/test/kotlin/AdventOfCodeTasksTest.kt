@@ -72,6 +72,11 @@ class AdventOfCodeTasksTest {
         runTaskTest(PaintingRobot(), 2041, message)
     }
 
+    @Test
+    fun day12() {
+        runTaskTest(Moons(), 7928, 518311327635164L)
+    }
+
     private fun runTaskTest(task: AdventOfCodeTask, part1Result: Any, part2Result: Any) {
         assertEquals(part1Result, task.run())
         assertEquals(part2Result, task.run(part2 = true))
