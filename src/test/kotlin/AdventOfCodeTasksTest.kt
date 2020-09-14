@@ -79,12 +79,17 @@ class AdventOfCodeTasksTest {
 
     @Test
     fun day13() {
-        runTaskTest(ArcadeGame(), 236, 11040)
+        runTaskTest(RepairDroid(), 236, 11040)
     }
 
     @Test
     fun day14() {
         runTaskTest(ChemicalReactions(), 843220L, 2169535L)
+    }
+
+    @Test
+    fun day15() {
+        runTaskTest(RepairDroid(), 254, 268)
     }
 
     private fun runTaskTest(task: AdventOfCodeTask, part1Result: Any, part2Result: Any) {
