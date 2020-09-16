@@ -1,58 +1,43 @@
+import utils.Coordinate
+import utils.Direction
+import utils.IntcodeComputer
+
 /** [https://adventofcode.com/2019/day/15] */
 class RepairDroid : AdventOfCodeTask {
     private class SearchFinished : Exception()
 
-    private data class Coordinate(val x: Int, val y: Int) {
-        fun neighbours(): List<Pair<Int, Coordinate>> {
-            return (1..4).map { it to adjacent(it) }
-        }
-
-        fun adjacent(direction: Int): Coordinate {
-            return when (direction) {
-                1 -> copy(y = y + 1)
-                2 -> copy(y = y - 1)
-                3 -> copy(x = x - 1)
-                4 -> copy(x = x + 1)
-                else -> throw IllegalStateException("Unknown direction $direction")
-            }
-        }
-    }
-
     override fun run(part2: Boolean): Any {
-        val computer = ExtendedIntCode()
-        val ops = computer.parseOps("15.txt")
+        val computer = IntcodeComputer()
         var position = Coordinate(0, 0)
         val board = mutableMapOf(position to '.')
         val visited = mutableSetOf(position)
-        val path = mutableListOf<Int>()
-        var direction = 1
+        val path = mutableListOf<Direction>()
+        var direction = Direction.UP
 
-        fun handleInput(): Long {
-            fun getNewDirection(): Int {
-                val neighbours = position.neighbours()
+        fun handleInput(): Int {
+            fun getNewDirection(): Direction {
+                val neighbours = position.adjacent()
 
-                return neighbours.firstOrNull { !board.containsKey(it.second) }?.first
-                    ?: when (path.removeLast()) {
-                        1 -> 2
-                        2 -> 1
-                        3 -> 4
-                        4 -> 3
-                        else -> throw IllegalStateException("Unknown direction $direction")
-                    }
+                return neighbours.entries.firstOrNull { !board.containsKey(it.value) }?.key
+                    ?: path.removeLast().turnOpposite()
             }
 
-
             direction = getNewDirection()
-            return direction.toLong()
+            return when (direction) {
+                Direction.UP -> 1
+                Direction.RIGHT -> 4
+                Direction.DOWN -> 2
+                Direction.LEFT -> 3
+            }
         }
 
-        fun handleOutput(status: Long) {
-            when (status.toInt()) {
+        fun handleOutput(status: Int) {
+            when (status) {
                 0 -> {
-                    board[position.adjacent(direction)] = '#'
+                    board[position.move(direction)] = '#'
                 }
                 1 -> {
-                    position = position.adjacent(direction)
+                    position = position.move(direction)
                     board[position] = '.'
                     if (!visited.contains(position)) {
                         path.add(direction)
@@ -60,19 +45,26 @@ class RepairDroid : AdventOfCodeTask {
                     visited.add(position)
                 }
                 2 -> {
-                    position = position.adjacent(direction)
+                    position = position.move(direction)
                     board[position] = 'O'
-                    path.add(direction)
-                    throw SearchFinished()
+                    if (!visited.contains(position)) {
+                        path.add(direction)
+                    }
+                    visited.add(position)
+                    if (!part2) {
+                        throw SearchFinished()
+                    }
                 }
                 else -> throw IllegalStateException("Invalid status $status")
             }
         }
 
         try {
-            computer.compute(ops, onInput = ::handleInput, onOutput = ::handleOutput)
+            computer.compute(computer.parseInstructions("15.txt"), onInput = ::handleInput, onOutput = ::handleOutput)
         } catch (ex: SearchFinished) {
-            // pass
+            // oxygen station found
+        } catch (ex: NoSuchElementException) {
+            // whole maze discovered
         }
 
         if (!part2) return path.size
@@ -81,7 +73,7 @@ class RepairDroid : AdventOfCodeTask {
         while (board.filterValues { it == '.' }.isNotEmpty()) {
             minutes++
             board.filterValues { it == 'O' }
-                .flatMap { it.key.neighbours().map { pair -> pair.second } }
+                .flatMap { it.key.adjacent().map { pair -> pair.value } }
                 .filter { cell -> board.getOrDefault(cell, ' ') == '.' }.forEach { cell ->
                     board[cell] = 'O'
                 }

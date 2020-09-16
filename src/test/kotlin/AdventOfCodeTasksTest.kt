@@ -79,7 +79,7 @@ class AdventOfCodeTasksTest {
 
     @Test
     fun day13() {
-        runTaskTest(RepairDroid(), 236, 11040)
+        runTaskTest(ArcadeGame(), 236, 11040)
     }
 
     @Test

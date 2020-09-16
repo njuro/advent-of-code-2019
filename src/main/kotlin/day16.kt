@@ -1,3 +1,4 @@
+import utils.readInputBlock
 import kotlin.math.abs
 
 /** [https://adventofcode.com/2019/day/16] */
@@ -28,6 +29,7 @@ class SignalTransmission : AdventOfCodeTask {
             result.add(abs(input.mapIndexed { index, number -> number * pattern[(index + 1) % pattern.size] }
                 .sum()) % 10)
         }
+        
         return result
     }
 }

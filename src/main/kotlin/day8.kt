@@ -1,3 +1,5 @@
+import utils.readInputBlock
+
 /** [https://adventofcode.com/2019/day/8] */
 class ImageFormat : AdventOfCodeTask {
     override fun run(part2: Boolean): Any {

@@ -1,3 +1,4 @@
+import utils.readInputLines
 import kotlin.math.ceil
 
 /** [https://adventofcode.com/2019/day/14] */
@@ -12,9 +13,11 @@ class ChemicalReactions : AdventOfCodeTask {
 
     private data class Reaction(val ingredients: Set<Ingredient>, val result: Ingredient)
 
+    private lateinit var reactions: Set<Reaction>
+
     override fun run(part2: Boolean): Any {
-        val reactions = readInputLines("14.txt").map(::parseReaction).toSet()
-        val orePerFuel = createIngredient(Ingredient("FUEL", 1), reactions)
+        reactions = readInputLines("14.txt").map(::parseReaction).toSet()
+        val orePerFuel = createIngredient(Ingredient("FUEL", 1))
         if (!part2) return orePerFuel
 
         val cargo = 1_000_000_000_000
@@ -22,7 +25,7 @@ class ChemicalReactions : AdventOfCodeTask {
         var upperBound = 10 * lowerBound
         while (upperBound - lowerBound > 1) {
             val quantity = (upperBound + lowerBound) / 2
-            val totalOres = createIngredient(Ingredient("FUEL", quantity), reactions)
+            val totalOres = createIngredient(Ingredient("FUEL", quantity))
             if (totalOres > cargo) {
                 upperBound = quantity
             } else {
@@ -35,7 +38,6 @@ class ChemicalReactions : AdventOfCodeTask {
 
     private fun createIngredient(
         ingredient: Ingredient,
-        reactions: Set<Reaction>,
         stock: MutableSet<Ingredient> = mutableSetOf()
     ): Long {
         if (ingredient.name == "ORE") {
@@ -54,7 +56,6 @@ class ChemicalReactions : AdventOfCodeTask {
         for (subIngredient in reaction.ingredients) {
             ores += createIngredient(
                 Ingredient(subIngredient.name, subIngredient.quantity * multiplier),
-                reactions,
                 stock
             )
         }

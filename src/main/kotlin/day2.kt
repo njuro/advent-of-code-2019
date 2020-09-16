@@ -1,43 +1,33 @@
+import utils.IntcodeComputer
+
 /** [https://adventofcode.com/2019/day/2] */
 class Intcode : AdventOfCodeTask {
-    override fun run(part2: Boolean): Any {
-        val ops = readInputBlock("2.txt").split(",").map { it.toInt() }.toMutableList()
+    private val computer = IntcodeComputer()
+    private val instructions = computer.parseInstructions("2.txt")
 
+    override fun run(part2: Boolean): Any {
         if (part2) {
             for (noun in 0..99) {
                 for (verb in 0..99) {
-                    if (compute(ops.toMutableList(), noun, verb) == 19690720) {
+                    if (computeWith(noun, verb) == 19690720) {
                         return 100 * noun + verb
                     }
                 }
             }
         } else {
-            return compute(ops.toMutableList(), 12, 2)
+            return computeWith(12, 2)
         }
 
         throw IllegalStateException()
     }
 
-    private fun compute(ops: MutableList<Int>, noun: Int, verb: Int): Int {
-        ops[1] = noun
-        ops[2] = verb
-        var i = 0
-        while (true) {
-            when (ops[i]) {
-                1 -> {
-                    ops[ops[i + 3]] = ops[ops[i + 1]] + ops[ops[i + 2]]
-                    i += 4
-                }
-                2 -> {
-                    ops[ops[i + 3]] = ops[ops[i + 1]] * ops[ops[i + 2]]
-                    i += 4
-                }
-                99 -> break
-                else -> throw IllegalStateException()
-            }
-        }
+    private fun computeWith(noun: Int, verb: Int): Int {
+        val instructionCopy = instructions.toMutableList()
+        instructionCopy[1] = noun.toLong()
+        instructionCopy[2] = verb.toLong()
 
-        return ops[0]
+        computer.compute(instructionCopy)
+        return instructionCopy[0].toInt()
     }
 }
 

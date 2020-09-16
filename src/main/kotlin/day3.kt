@@ -1,14 +1,9 @@
-import kotlin.math.abs
+import utils.Coordinate
+import utils.readInputLines
 
 /** [https://adventofcode.com/2019/day/3] */
 class WireIntersection : AdventOfCodeTask {
     private val coordRegex = Regex("([URDL])(\\d+)")
-
-    private data class Coordinate(val x: Int, val y: Int) {
-        fun distanceFromCenter(): Int {
-            return abs(x) + abs(y)
-        }
-    }
 
     override fun run(part2: Boolean): Any {
         val (wire1, wire2) = readInputLines("3.txt")
@@ -17,10 +12,9 @@ class WireIntersection : AdventOfCodeTask {
         val intersections = wire1coords.intersect(wire2coords)
 
         return if (part2) {
-            fun steps(coord: Coordinate): Int = wire1coords.indexOf(coord) + wire2coords.indexOf(coord) + 2
-            steps(intersections.minByOrNull(::steps)!!)
+            intersections.map { wire1coords.indexOf(it) + wire2coords.indexOf(it) + 2 }.minOrNull()!!
         } else {
-            intersections.minByOrNull(Coordinate::distanceFromCenter)!!.distanceFromCenter()
+            intersections.map(Coordinate::distanceToCenter).minOrNull()!!
         }
     }
 
@@ -31,22 +25,14 @@ class WireIntersection : AdventOfCodeTask {
         for (operation in wire.split(",")) {
             val (direction, length) = coordRegex.find(operation)!!.destructured
             val transform: (Coordinate) -> Coordinate = when (direction) {
-                "U" -> {
-                    { it.copy(y = it.y + 1) }
-                }
-                "R" -> {
-                    { it.copy(x = it.x + 1) }
-                }
-                "D" -> {
-                    { it.copy(y = it.y - 1) }
-                }
-                "L" -> {
-                    { it.copy(x = it.x - 1) }
-                }
-                else -> throw IllegalStateException()
+                "U" -> Coordinate::up
+                "R" -> Coordinate::right
+                "D" -> Coordinate::down
+                "L" -> Coordinate::left
+                else -> throw IllegalAccessException("Unknown direction $direction")
             }
 
-            for (i in 1..length.toInt()) {
+            repeat(length.toInt()) {
                 coord = transform(coord)
                 coords.add(coord)
             }

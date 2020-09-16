@@ -4,19 +4,22 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import utils.IntcodeComputer
+import utils.permutations
 
 /** [https://adventofcode.com/2019/day/7] */
 class Amplifiers : AdventOfCodeTask {
-    val computer = ExtendedIntCode()
+    val computer = IntcodeComputer()
 
     override fun run(part2: Boolean): Any {
-        val ops = computer.parseOps("7.txt")
+        val instructions = computer.parseInstructions("7.txt")
         val phaseList = (if (part2) 5..9 else 0..4).toList()
         var maxOutputSignal = Int.MIN_VALUE
 
-        for ((a, b, c, d, e) in permutations(phaseList)) {
+        for ((a, b, c, d, e) in phaseList.permutations()) {
             val outputSignal =
-                if (part2) computeTotalSignalAsync(ops, a, b, c, d, e) else computeTotalSignal(ops, a, b, c, d, e)
+                if (part2) computeTotalSignalAsync(instructions, a, b, c, d, e) else
+                    computeTotalSignal(instructions, a, b, c, d, e)
             if (outputSignal > maxOutputSignal) {
                 maxOutputSignal = outputSignal
             }
@@ -25,51 +28,29 @@ class Amplifiers : AdventOfCodeTask {
         return maxOutputSignal
     }
 
-    private fun <T> permutations(list: List<T>): Set<List<T>> {
-        if (list.isEmpty()) {
-            return setOf()
-        }
-
-        if (list.size == 1) {
-            return setOf(list)
-        }
-
-        val result = mutableSetOf<List<T>>()
-        for (element in list) {
-            val copy = list.toMutableList().also { it.remove(element) }
-            for (perms in permutations(copy)) {
-                result += mutableListOf(element) + perms
-            }
-        }
-
-        return result
-    }
-
     private fun computeTotalSignal(
-        ops: MutableList<Long>,
+        instructions: MutableList<Long>,
         aPhase: Int,
         bPhase: Int,
         cPhase: Int,
         dPhase: Int,
         ePhase: Int,
     ): Int {
-        val aSignal = computeAmplifierSignal(ops, aPhase, 0)
-        val bSignal = computeAmplifierSignal(ops, bPhase, aSignal)
-        val cSignal = computeAmplifierSignal(ops, cPhase, bSignal)
-        val dSignal = computeAmplifierSignal(ops, dPhase, cSignal)
+        val aSignal = computeAmplifierSignal(instructions, aPhase, 0)
+        val bSignal = computeAmplifierSignal(instructions, bPhase, aSignal)
+        val cSignal = computeAmplifierSignal(instructions, cPhase, bSignal)
+        val dSignal = computeAmplifierSignal(instructions, dPhase, cSignal)
 
-        return computeAmplifierSignal(ops, ePhase, dSignal)
+        return computeAmplifierSignal(instructions, ePhase, dSignal)
     }
 
-    private fun computeAmplifierSignal(ops: MutableList<Long>, phaseSetting: Int, inputSignal: Int): Int {
-        val inputs = mutableListOf(phaseSetting.toLong(), inputSignal.toLong())
-        return computer.compute(
-            ops.toMutableList(),
-            onInput = { inputs.removeFirst() }).toInt()
+    private fun computeAmplifierSignal(instructions: MutableList<Long>, phaseSetting: Int, inputSignal: Int): Int {
+        val inputs = mutableListOf(phaseSetting, inputSignal)
+        return computer.compute(instructions.toMutableList(), onInput = { inputs.removeFirst() })
     }
 
     private fun computeTotalSignalAsync(
-        ops: MutableList<Long>,
+        instructions: MutableList<Long>,
         aPhase: Int,
         bPhase: Int,
         cPhase: Int,
@@ -86,11 +67,11 @@ class Amplifiers : AdventOfCodeTask {
             val eChannel = Channel<Int>(UNLIMITED).also { it.send(ePhase) }
 
 
-            computeAmplifierSignalAsync(ops, aChannel, bChannel)
-            computeAmplifierSignalAsync(ops, bChannel, cChannel)
-            computeAmplifierSignalAsync(ops, cChannel, dChannel)
-            computeAmplifierSignalAsync(ops, dChannel, eChannel)
-            computeAmplifierSignalAsync(ops, eChannel, aChannel).join()
+            computeAmplifierSignalAsync(instructions, aChannel, bChannel)
+            computeAmplifierSignalAsync(instructions, bChannel, cChannel)
+            computeAmplifierSignalAsync(instructions, cChannel, dChannel)
+            computeAmplifierSignalAsync(instructions, dChannel, eChannel)
+            computeAmplifierSignalAsync(instructions, eChannel, aChannel).join()
 
             totalSignal = aChannel.receive()
         }
@@ -99,15 +80,15 @@ class Amplifiers : AdventOfCodeTask {
     }
 
     private fun computeAmplifierSignalAsync(
-        ops: MutableList<Long>,
+        instructions: MutableList<Long>,
         inputChannel: Channel<Int>,
         outputChannel: Channel<Int>
     ): Job {
         return GlobalScope.launch {
             computer.compute(
-                ops.toMutableList(),
-                onInput = { runBlocking { inputChannel.receive().toLong() } },
-                onOutput = { runBlocking { outputChannel.send(it.toInt()) } }
+                instructions.toMutableList(),
+                onInput = { runBlocking { inputChannel.receive() } },
+                onOutput = { runBlocking { outputChannel.send(it) } }
             )
         }
     }

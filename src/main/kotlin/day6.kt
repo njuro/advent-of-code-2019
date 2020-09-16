@@ -1,3 +1,5 @@
+import utils.readInputLines
+
 /** [https://adventofcode.com/2019/day/6] */
 class PlanetOrbits : AdventOfCodeTask {
     private data class Planet(val name: String) {

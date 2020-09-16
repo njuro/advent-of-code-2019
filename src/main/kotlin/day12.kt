@@ -1,3 +1,5 @@
+import utils.lcm
+import utils.readInputLines
 import kotlin.math.abs
 
 /** [https://adventofcode.com/2019/day/12] */
@@ -65,17 +67,6 @@ class Moons : AdventOfCodeTask {
         } while (stepsX == null || stepsY == null || stepsZ == null)
 
         return lcm(lcm(stepsX, stepsY), stepsZ)
-    }
-
-    private fun lcm(a: Long, b: Long): Long {
-        fun gcd(a: Long, b: Long): Long {
-
-            if (a == 0L) return b
-
-            return gcd(b % a, a)
-        }
-
-        return a * (b / gcd(a, b))
     }
 
     private fun performStep(moons: List<Moon>) {

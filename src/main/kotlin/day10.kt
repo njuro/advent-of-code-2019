@@ -1,15 +1,11 @@
+import utils.Coordinate
+import utils.readInputLines
 import java.util.Collections.sort
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.atan2
 
 /** [https://adventofcode.com/2019/day/10] */
+private typealias Asteroid = Coordinate
+
 class Asteroids : AdventOfCodeTask {
-    private data class Asteroid(val x: Int, val y: Int) {
-        fun distanceTo(other: Asteroid): Int {
-            return abs(x - other.x) + abs(y - other.y)
-        }
-    }
 
     override fun run(part2: Boolean): Any {
         val asteroids = mutableListOf<Asteroid>()
@@ -49,12 +45,7 @@ class Asteroids : AdventOfCodeTask {
 
     private fun neighboursByLineOfSight(source: Asteroid, asteroids: List<Asteroid>): Map<Double, List<Asteroid>> {
         return asteroids.filter { it != source }
-            .groupBy { other ->
-                (atan2(
-                    (other.y - source.y).toDouble(),
-                    (other.x - source.x).toDouble()
-                ) * 180 / PI + 90).let { if (it < 0) it + 360 else it }
-            }.toSortedMap()
+            .groupBy { source.angleTo(it, inDegrees = true) }.toSortedMap()
             .also { it.forEach { (_, list) -> sort(list, compareBy { other -> source.distanceTo(other) }) } }
     }
 }
