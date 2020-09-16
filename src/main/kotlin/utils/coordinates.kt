@@ -23,28 +23,28 @@ data class Coordinate(val x: Int, val y: Int) {
         return if (inDegrees) (radians * 180 / PI + 90).let { if (it < 0) it + 360 else it } else radians
     }
 
-    fun up(delta: Int = 1): Coordinate {
+    fun north(delta: Int = 1): Coordinate {
         return copy(y = y + delta)
     }
 
-    fun right(delta: Int = 1): Coordinate {
+    fun east(delta: Int = 1): Coordinate {
         return copy(x = x + delta)
     }
 
-    fun down(delta: Int = 1): Coordinate {
+    fun south(delta: Int = 1): Coordinate {
         return copy(y = y - delta)
     }
 
-    fun left(delta: Int = 1): Coordinate {
+    fun west(delta: Int = 1): Coordinate {
         return copy(x = x - delta)
     }
 
-    fun move(direction: Direction): Coordinate {
+    fun move(direction: Direction, offset: Boolean = false): Coordinate {
         return when (direction) {
-            Direction.UP -> up()
-            Direction.RIGHT -> right()
-            Direction.DOWN -> down()
-            Direction.LEFT -> left()
+            Direction.UP -> if (offset) south() else north()
+            Direction.RIGHT -> east()
+            Direction.DOWN -> if (offset) north() else south()
+            Direction.LEFT -> west()
         }
     }
 
@@ -69,14 +69,14 @@ fun Map<Coordinate, Char>.maxY(): Int {
     return maxByOrNull { it.key.y }!!.key.y
 }
 
-fun Map<Coordinate, Char>.toStringRepresentation(offsetCoordinates: Boolean = false): String {
+fun Map<Coordinate, Char>.toStringRepresentation(offsetCoordinates: Boolean = false, separator: String = " "): String {
     val map = StringBuilder()
 
     val yRange = if (offsetCoordinates) minY()..maxY() else maxY() downTo minY()
     for (y in yRange) {
         for (x in minX()..maxX()) {
             map.append(getValue(Coordinate(x, y)))
-            map.append(" ")
+            map.append(separator)
         }
         map.append('\n')
     }

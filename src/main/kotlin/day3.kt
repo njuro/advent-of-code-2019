@@ -25,10 +25,10 @@ class WireIntersection : AdventOfCodeTask {
         for (operation in wire.split(",")) {
             val (direction, length) = coordRegex.find(operation)!!.destructured
             val transform: (Coordinate) -> Coordinate = when (direction) {
-                "U" -> Coordinate::up
-                "R" -> Coordinate::right
-                "D" -> Coordinate::down
-                "L" -> Coordinate::left
+                "U" -> Coordinate::north
+                "R" -> Coordinate::east
+                "D" -> Coordinate::south
+                "L" -> Coordinate::west
                 else -> throw IllegalAccessException("Unknown direction $direction")
             }
 
