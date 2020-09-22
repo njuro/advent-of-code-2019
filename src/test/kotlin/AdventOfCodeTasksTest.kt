@@ -97,6 +97,11 @@ class AdventOfCodeTasksTest {
         runTaskTest(Scaffolding(), 6680, 1103905)
     }
 
+    @Test
+    fun day18() {
+        runTaskTest(Tunnels(), 4954, 2334)
+    }
+
     private fun runTaskTest(task: AdventOfCodeTask, part1Result: Any, part2Result: Any) {
         assertEquals(part1Result, task.run())
         assertEquals(part2Result, task.run(part2 = true))
