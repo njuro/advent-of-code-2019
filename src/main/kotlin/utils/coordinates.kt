@@ -23,33 +23,33 @@ data class Coordinate(val x: Int, val y: Int) {
         return if (inDegrees) (radians * 180 / PI + 90).let { if (it < 0) it + 360 else it } else radians
     }
 
-    fun north(delta: Int = 1): Coordinate {
-        return copy(y = y + delta)
+    fun up(delta: Int = 1, offset: Boolean = false): Coordinate {
+        return if (offset) down(delta, false) else copy(y = y + delta)
     }
 
-    fun east(delta: Int = 1): Coordinate {
+    fun right(delta: Int = 1): Coordinate {
         return copy(x = x + delta)
     }
 
-    fun south(delta: Int = 1): Coordinate {
-        return copy(y = y - delta)
+    fun down(delta: Int = 1, offset: Boolean = false): Coordinate {
+        return if (offset) up(delta, false) else copy(y = y - delta)
     }
 
-    fun west(delta: Int = 1): Coordinate {
+    fun left(delta: Int = 1): Coordinate {
         return copy(x = x - delta)
     }
 
     fun move(direction: Direction, offset: Boolean = false): Coordinate {
         return when (direction) {
-            Direction.UP -> if (offset) south() else north()
-            Direction.RIGHT -> east()
-            Direction.DOWN -> if (offset) north() else south()
-            Direction.LEFT -> west()
+            Direction.UP -> up(offset = offset)
+            Direction.RIGHT -> right()
+            Direction.DOWN -> down(offset = offset)
+            Direction.LEFT -> left()
         }
     }
 
-    fun adjacent(): Map<Direction, Coordinate> {
-        return Direction.values().associateWith(::move)
+    fun adjacent(offset: Boolean = false): Map<Direction, Coordinate> {
+        return Direction.values().associateWith { move(it, offset) }
     }
 }
 
