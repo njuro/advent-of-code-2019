@@ -1,50 +1,64 @@
 import utils.Coordinate
+import utils.maxX
+import utils.maxY
 import utils.readInputLines
 
 /** [https://adventofcode.com/2019/day/20] */
 class Teleports : AdventOfCodeTask {
 
     private val map = mutableMapOf<Coordinate, Char>().withDefault { ' ' }
+    private var maxX = 0
+    private var maxY = 0
     private val teleports = mutableMapOf<String, MutableSet<Coordinate>>().withDefault { mutableSetOf() }
-    private var shortestPath = Int.MAX_VALUE
 
     override fun run(part2: Boolean): Any {
         readInputLines("20.txt").forEachIndexed { y, row ->
             row.forEachIndexed { x, c -> map[Coordinate(x, y)] = c }
         }
+        maxX = map.maxX()
+        maxY = map.maxY()
         loadTeleports()
-        findShortestPath()
-        return shortestPath
+        return findShortestPath(multiLevel = part2)
     }
 
-    private fun findShortestPath() {
-        val visited = mutableSetOf<Coordinate>()
-        val queue = mutableListOf(teleports.getValue("AA").elementAt(0) to 0)
-        while (queue.isNotEmpty()) {
-            val (position, steps) = queue.removeFirst()
-            if (visited.contains(position)) {
+    private fun findShortestPath(multiLevel: Boolean): Int {
+        val visited = mutableMapOf<Int, MutableSet<Coordinate>>().withDefault { mutableSetOf() }
+        val queue = mutableListOf(Triple(teleports.getValue("AA").elementAt(0), 0, 0))
+        while (true) {
+            val (position, steps, level) = queue.removeFirst()
+            if (visited.getValue(level).contains(position)) {
                 continue
             }
-            visited.add(position)
+            visited[level] = visited.getValue(level).apply { add(position) }
 
             if (map.getValue(position) != '.') {
                 continue
             }
 
-            if (position == teleports.getValue("ZZ").elementAt(0)) {
-                if (steps < shortestPath) {
-                    shortestPath = steps
-                }
-                continue
+            if (position == teleports.getValue("ZZ").elementAt(0) && level == 0) {
+                return steps
             }
 
             for (neighbour in position.adjacent(offset = true).values) {
                 var newPosition = neighbour
+                var newLevel = level
                 if (map.getValue(neighbour).isUpperCase()) {
                     newPosition = teleports.values.filter { it.size > 1 }.firstOrNull { it.contains(position) }
                         ?.first { it != position } ?: neighbour
+                    if (multiLevel) {
+                        if (isOuterPosition(neighbour)) {
+                            if (level == 0) {
+                                continue
+                            } else {
+                                newLevel--
+                            }
+                        } else {
+                            newLevel++
+                        }
+                    }
                 }
-                queue.add(newPosition to steps + 1)
+
+                queue.add(Triple(newPosition, steps + 1, newLevel))
             }
         }
     }
@@ -70,8 +84,12 @@ class Teleports : AdventOfCodeTask {
                 teleports[name] = teleports.getValue(name).apply { add(position) }
             }
     }
+
+    private fun isOuterPosition(position: Coordinate): Boolean {
+        return position.x <= 1 || position.x >= maxX - 1 || position.y <= 1 || position.y >= maxY - 1
+    }
 }
 
 fun main() {
-    println(Teleports().run(part2 = false))
+    println(Teleports().run(part2 = true))
 }
