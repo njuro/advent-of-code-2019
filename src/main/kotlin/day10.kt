@@ -46,7 +46,7 @@ class Asteroids : AdventOfCodeTask {
     private fun neighboursByLineOfSight(source: Asteroid, asteroids: List<Asteroid>): Map<Double, List<Asteroid>> {
         return asteroids.filter { it != source }
             .groupBy { source.angleTo(it, inDegrees = true) }.toSortedMap()
-            .also { it.forEach { (_, list) -> sort(list, compareBy { other -> source.distanceTo(other) }) } }
+            .onEach { (_, list) -> sort(list, compareBy { other -> source.distanceTo(other) }) }
     }
 }
 
