@@ -3,7 +3,7 @@ package utils
 class IntcodeComputer {
 
     fun parseInstructions(filename: String): MutableList<Long> {
-        return readInputBlock(filename).split(",").map { it.toLong() }.toMutableList()
+        return readInputBlock(filename).trim().split(",").map { it.toLong() }.toMutableList()
     }
 
     fun compute(
