@@ -1,6 +1,7 @@
 import utils.Coordinate
 import utils.readInputLines
 
+/** [https://adventofcode.com/2019/day/18] */
 class Tunnels : AdventOfCodeTask {
 
     private lateinit var paths: Map<Char, Set<Path>>

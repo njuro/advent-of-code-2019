@@ -1,6 +1,7 @@
 import utils.IntcodeComputer
 import utils.permutations
 
+/** [https://adventofcode.com/2019/day/25] */
 class Adventure : AdventOfCodeTask {
 
     override fun run(part2: Boolean): Any {

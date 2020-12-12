@@ -3,6 +3,7 @@ import utils.Direction
 import utils.IntcodeComputer
 import utils.toStringRepresentation
 
+/** [https://adventofcode.com/2019/day/17] */
 class Scaffolding : AdventOfCodeTask {
 
     private class Robot(var position: Coordinate, var direction: Direction) {
